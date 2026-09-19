@@ -1,10 +1,10 @@
 package algeo;
 
-import algeo.modules.ModuleContoh;
+import algeo.modules.Matriks;
 
 public class App {
     public static void main(String[] args) {
-        ModuleContoh module = new ModuleContoh();
+        Matriks module = new Matriks();
         module.jalankan();
     }
 }
