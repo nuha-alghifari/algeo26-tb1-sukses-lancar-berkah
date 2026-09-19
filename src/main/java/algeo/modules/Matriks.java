@@ -44,11 +44,11 @@ public class Matriks {
         }
 
     public Matriks transpose(){
-        Matriks hasil = new Matriks(this.cols, this.rows);
+        Matriks hasil = new Matriks(cols, rows);
 
-        for(int i = 0; i < this.rows; i++){
-            for(int j = 0; i < this.cols; j++){
-                hasil.data[j][i] = this.data[j][i];
+        for(int i = 0; i < rows; i++){
+            for(int j = 0; i < cols; j++){
+                hasil.data[j][i] = data[j][i];
             }
         }
     return hasil;
@@ -75,11 +75,11 @@ public class Matriks {
     }
 
     public Matriks kaliSkalar(double y){
-        Matriks hasil = new Matriks(this.rows, this.cols);
+        Matriks hasil = new Matriks(rows, cols);
 
-        for(int i = 0; i < this.rows; i++){
-            for(int j = 0; j < this.cols; j++){
-                hasil.data[i][j] = this.data[i][j] * y;
+        for(int i = 0; i < rows; i++){
+            for(int j = 0; j < cols; j++){
+                hasil.data[i][j] = data[i][j] * y;
             }
         }
         return hasil;
