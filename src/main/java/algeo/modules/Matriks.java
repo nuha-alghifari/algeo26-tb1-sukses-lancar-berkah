@@ -1,5 +1,7 @@
 package algeo.modules;
 
+import java.util.Scanner;
+
 public class Matriks {
     private double[][] data;
     private int rows;
@@ -11,10 +13,37 @@ public class Matriks {
         this.data = new double[rows][cols];
     }
 
-    public Matriks tambah(Matriks M2){
+    public void inputMatriks(Scanner scanner) throws Exception{
+        if(this.rows > 12 || this.cols > 11){
+            throw new IllegalArgumentException("Masukkan matriks maksimal 11 x 11 atau 11 x 12 untuk matriks augmented");
+        }
+
+        System.out.println("Masukkan matriks (" + this.rows + "x" + this.cols +") [Spasi sebagai pemisah]: ");
+
+        for(int i = 0; i < this.rows; i++){
+            for(int j = 0; j < this.cols; j++){
+                boolean inputValid = false;
+
+                while(!inputValid){
+                    try{
+                        String input = scanner.next();
+
+                        input = input.replace(',', '.');
+
+                        this.data[i][j] = Double.parseDouble(input);
+
+                        inputValid = true;
+                    } catch (NumberFormatException e){
+                        System.out.println("Input tidak valid, hanya masukkan angka untuk elemen matriks");
+                    }
+                }
+            }
+        }
+    }
+
+    public Matriks tambah(Matriks M2) throws Exception{
         if(this.rows != M2.rows || this.cols != M2.cols){
-            System.out.println("Ukuran matriks tidak sama");
-            return null;
+            throw new Exception("Ukuran matriks tidak sama");
         }
 
         Matriks hasil = new Matriks(this.rows, this.cols);
@@ -83,6 +112,22 @@ public class Matriks {
             }
         }
         return hasil;
+    }
+
+    public void tukarBaris(int row1, int row2) throws IllegalArgumentException {
+        if(row1 < 0 || row1 >= this.rows || row2 < 0 || row2 >= this.rows){
+            throw new IllegalArgumentException("Indeks Baris tidak valid");
+        }
+
+        if(row1 == row2){
+            return;
+        }
+
+        for(int j = 0; j < this.cols; j++){
+            double temp = this.data[row1][j];
+            this.data[row1][j] = this.data[row2][j];
+            this.data[row2][j] = temp;
+        }
     }
 }
 
