@@ -14,7 +14,7 @@ public class Matriks {
     }
 
     public void inputMatriks(Scanner scanner){
-        if(this.rows > 12 || this.cols > 11){
+        if(this.rows > 11 || this.cols > 12){
             throw new IllegalArgumentException("Masukkan matriks maksimal 11 x 11 atau 11 x 12 untuk matriks augmented");
         }
 
@@ -34,7 +34,7 @@ public class Matriks {
 
                         inputValid = true;
                     } catch (NumberFormatException e){
-                        throw new NumberFormatException("Input tidak valid, hanya masukkan angka untuk elemen matriks");
+                        System.out.print("Input tidak valid! Hanya masukkan angka untuk elemen matriks [" + i + "][" + j + "]: ");
                     }
                 }
             }
@@ -64,7 +64,7 @@ public class Matriks {
         Matriks hasil = new Matriks(this.rows, this.cols);
 
         for(int i = 0; i < this.rows; i++){
-            for(int j = 0; i < this.cols; j++){
+            for(int j = 0; j < this.cols; j++){
                 hasil.data[i][j] = this.data[i][j] - M2.data[i][j];
             }
         }
@@ -75,8 +75,8 @@ public class Matriks {
         Matriks hasil = new Matriks(cols, rows);
 
         for(int i = 0; i < rows; i++){
-            for(int j = 0; i < cols; j++){
-                hasil.data[j][i] = data[j][i];
+            for(int j = 0; j < cols; j++){
+                hasil.data[j][i] = data[i][j];
             }
         }
     return hasil;
@@ -90,7 +90,7 @@ public class Matriks {
         Matriks hasil = new Matriks(this.rows, M2.cols);
 
         for(int i = 0; i < this.rows; i++){
-            for(int j = 0; i < M2.cols; j++){
+            for(int j = 0; j < M2.cols; j++){
                 double total = 0.0;
                 for(int x = 0; x < this.cols; x++){
                     total += this.data[i][x] * M2.data[x][j];
