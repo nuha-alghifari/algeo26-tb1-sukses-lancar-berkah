@@ -13,6 +13,38 @@ public class Matriks {
         this.data = new double[rows][cols];
     }
 
+    public int getRows(){
+        return this.rows;
+    }
+
+    public int getCols(){
+        return this.cols;
+    }
+
+    public double[][] getData(){
+        return this.data;
+    }
+
+    public Matriks copy(){
+        Matriks salinan = new Matriks(this.rows, this.cols);
+
+        for(int i = 0; i < this.rows; i++){
+            for(int j = 0; j < this.cols; j++){
+                salinan.data[i][j] = this.data[i][j];
+            }
+        }
+        return salinan;
+    }
+
+    public void printMatriks(){
+        for(int i = 0; i < this.rows; i++){
+            for(int j = 0; j < this.cols; j++){
+                System.out.printf("%.3f ", this.data[i][j]);
+            }
+        System.out.println();
+        }
+    }
+
     public void inputMatriks(Scanner scanner){
         if(this.rows > 11 || this.cols > 12){
             throw new IllegalArgumentException("Masukkan matriks maksimal 11 x 11 atau 11 x 12 untuk matriks augmented");
