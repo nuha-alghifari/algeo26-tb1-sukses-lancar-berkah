@@ -13,7 +13,7 @@ public class Matriks {
         this.data = new double[rows][cols];
     }
 
-    public void inputMatriks(Scanner scanner) throws Exception{
+    public void inputMatriks(Scanner scanner){
         if(this.rows > 12 || this.cols > 11){
             throw new IllegalArgumentException("Masukkan matriks maksimal 11 x 11 atau 11 x 12 untuk matriks augmented");
         }
@@ -34,16 +34,16 @@ public class Matriks {
 
                         inputValid = true;
                     } catch (NumberFormatException e){
-                        System.out.println("Input tidak valid, hanya masukkan angka untuk elemen matriks");
+                        throw new NumberFormatException("Input tidak valid, hanya masukkan angka untuk elemen matriks");
                     }
                 }
             }
         }
     }
 
-    public Matriks tambah(Matriks M2) throws Exception{
+    public Matriks tambah(Matriks M2){
         if(this.rows != M2.rows || this.cols != M2.cols){
-            throw new Exception("Ukuran matriks tidak sama");
+            throw new IllegalArgumentException("Ukuran matriks tidak sama");
         }
 
         Matriks hasil = new Matriks(this.rows, this.cols);
@@ -58,8 +58,7 @@ public class Matriks {
 
     public Matriks kurang(Matriks M2){
         if(this.rows != M2.rows || this.cols != M2.cols){
-            System.out.println("Ukuran matriks tidak sama");
-            return null;
+            throw new IllegalArgumentException("Ukuran matriks tidak sama");
         }
 
         Matriks hasil = new Matriks(this.rows, this.cols);
@@ -85,8 +84,7 @@ public class Matriks {
 
     public Matriks kali(Matriks M2){
         if(this.cols != M2.rows){
-            System.out.println("Matriks tidak bisa dikalikan karena jumlah elemen di baris 1 matriks 1 tidak sama dengan jumlah elemen di baris 1 matriks 2");
-            return null;
+            throw new IllegalArgumentException("Matriks tidak bisa dikalikan karena jumlah elemen di baris 1 matriks 1 tidak sama dengan jumlah elemen di baris 1 matriks 2");
         }
 
         Matriks hasil = new Matriks(this.rows, M2.cols);
@@ -114,7 +112,7 @@ public class Matriks {
         return hasil;
     }
 
-    public void tukarBaris(int row1, int row2) throws IllegalArgumentException {
+    public void tukarBaris(int row1, int row2){
         if(row1 < 0 || row1 >= this.rows || row2 < 0 || row2 >= this.rows){
             throw new IllegalArgumentException("Indeks Baris tidak valid");
         }
@@ -128,6 +126,25 @@ public class Matriks {
             this.data[row1][j] = this.data[row2][j];
             this.data[row2][j] = temp;
         }
+    }
+
+    public Matriks getSubMatriksKofaktor(int skipRow, int skipCol){
+        Matriks hasil = new Matriks(this.rows - 1, this.cols - 1);
+
+        int r = 0;
+        for(int i = 0; i < this.rows; i++){
+            if(i == skipRow) continue;
+            
+            int c = 0;
+            for(int j = 0; j < this.cols; j++){
+                if(j == skipCol) continue;
+
+                hasil.data[r][c] = this.data[i][j];
+                c++;
+            }
+            r++;
+        }
+        return hasil;
     }
 }
 
