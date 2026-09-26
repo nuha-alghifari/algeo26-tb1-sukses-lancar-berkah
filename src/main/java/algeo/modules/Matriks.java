@@ -178,5 +178,39 @@ public class Matriks {
         }
         return hasil;
     }
+
+    public double getElemen(int i, int j){
+        return this.data[i][j];
+    }
+
+    public void setElemen(int i, int j, double nilai){
+        this.data[i][j] = nilai;
+    }
+
+    public void kaliBaris(int baris, double faktor){
+        for(int j = 0; j < this.cols; j++){
+            this.data[baris][j] *= faktor;
+        }
+    }
+
+    
+    public void tambahBaris(int barisTarget, int barisSumber, double faktor){
+        for(int j = 0; j < this.cols; j++){
+            this.data[barisTarget][j] += faktor * this.data[barisSumber][j];
+        }
+    }
+    public String keString(){
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < this.rows; i++){
+            for(int j = 0; j < this.cols; j++){
+                double v = this.data[i][j];
+                if(Math.abs(v) < 1e-9) v = 0.0;
+                sb.append(String.format("%.3f", v));
+                if(j < this.cols - 1) sb.append("\t");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
 }
+
 
