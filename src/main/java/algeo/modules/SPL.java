@@ -48,4 +48,22 @@ public class SPL {
         return kolomPivot;
     }
 
+    static void eliminasiMundur(Matriks m, List<Integer> kolomPivot, List<String> langkah){
+        for(int i = kolomPivot.size() - 1; i >= 0; i--){
+            int kol = kolomPivot.get(i);
+            for(int r = i - 1; r >= 0; r--){
+                double faktor = m.getElemen(r, kol);
+                if(faktor != 0.0){
+                    m.tambahBaris(r, i, -faktor);
+                    langkah.add("R" + (r + 1) + " <- R" + (r + 1) + " - (" + format(faktor) + ") * R" + (i + 1) + "\n" + m.keString());
+                }
+            }
+        }
+    }
+    //spek
+    static String format(double v){
+        if(Math.abs(v) < EPS) v = 0.0;
+        return String.format("%.3f", v);
+    }
+
 }
