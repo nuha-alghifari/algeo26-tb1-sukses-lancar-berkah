@@ -22,7 +22,6 @@ public class Determinan {
             for(int k = i+1; k < x; k++){
                 if(Math.abs(m[k][i]) > max){
                     max = Math.abs(m[k][i]);
-                    jumlahTukarBaris += 1;
                     pivot = k;
                 }
             }
@@ -35,7 +34,7 @@ public class Determinan {
             if(pivot != i){
                 obe.tukarBaris(i, pivot);
                 jumlahTukarBaris++;
-                System.out.println("Baris " + (i+1) + "ditukar dengan baris " + (pivot + 1));
+                System.out.println("Baris " + (i+1) + " ditukar dengan baris " + (pivot + 1));
                 obe.printMatriks();
             }
 
@@ -74,5 +73,5 @@ public class Determinan {
         }
         return 0;
     }
-    
+
 }
