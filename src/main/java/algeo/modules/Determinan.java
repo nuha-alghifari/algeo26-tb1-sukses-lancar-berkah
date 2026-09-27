@@ -164,19 +164,4 @@ public class Determinan {
         }
     return hasil;
     }
-
-    public static String formatOutput(String metode, Matriks input, double determinan) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Metode perhitungan determinan: ").append(metode).append("\n");
-        sb.append("Input matriks yang digunakan:\n");
-        double[][] m = input.getData();
-        for (int i = 0; i < input.getRows(); i++) {
-            for (int j = 0; j < input.getCols(); j++) {
-                sb.append(String.format("%.3f ", m[i][j]));
-            }
-            sb.append("\n");
-        }
-        sb.append("Hasil determinan: ").append(String.format("%.3f", determinan)).append("\n");
-        return sb.toString();
-    }
 }
