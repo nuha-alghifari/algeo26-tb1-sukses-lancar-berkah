@@ -22,7 +22,6 @@ public class Determinan {
             for(int k = i+1; k < x; k++){
                 if(Math.abs(m[k][i]) > max){
                     max = Math.abs(m[k][i]);
-                    jumlahTukarBaris += 1;
                     pivot = k;
                 }
             }
@@ -35,7 +34,7 @@ public class Determinan {
             if(pivot != i){
                 obe.tukarBaris(i, pivot);
                 jumlahTukarBaris++;
-                System.out.println("Baris " + (i+1) + "ditukar dengan baris " + (pivot + 1));
+                System.out.println("Baris " + (i+1) + " ditukar dengan baris " + (pivot + 1));
                 obe.printMatriks();
             }
 
@@ -72,7 +71,97 @@ public class Determinan {
         if(M.getRows() != M.getCols()){
             throw new IllegalArgumentException("Matriks tidak memiliki determinan");
         }
-        return 0;
+        System.out.println("Menghitung Determinan Matriks Dengan Metode Reduksi Baris/OBE");
+        return kofaktorRekursif(M, 0);
     }
-    
+
+    private static int tanda(int i, int j){
+        if((i+j) % 2 == 0){
+            return 1;
+        } else {
+            return -1;
+        }
+    }
+
+    private static String indentasi(int depth){
+        StringBuilder a = new StringBuilder();
+        for(int i = 0; i < depth; i++){
+            a.append("  ");
+        }
+        return a.toString();
+    }
+
+    public static double kofaktorRekursif(Matriks M, int depth){
+        int x = M.getRows();
+        double[][] m = M.getData();
+        String indent = indentasi(depth);
+
+        if(x == 1){
+            return m[0][0];
+        }
+
+        if(x == 2){
+            double hasilm2x2 = m[0][0]*m[1][1] - m[0][1]*m[1][0];
+            System.out.println("Matriks 2x2, Determinan = " + String.format(".3%", hasilm2x2));
+            return hasilm2x2;
+        }
+
+        int barisTerbaik = 0;
+        int kolomTerbaik = 0;
+        int nolDiBaris = -1;
+        int nolDiKolom = -1;
+
+        for(int i = 0; i < x; i++){
+            int count = 0;
+            for(int j = 0; j < x; j++){
+                if(Math.abs(m[i][j]) == 0){
+                    count++;
+                }
+            }
+            if(count > nolDiBaris){
+                nolDiBaris = count;
+                barisTerbaik = i;
+            }
+        }
+
+        for(int j = 0; j < x; j++){
+            int count = 0;
+            for(int i = 0; i < x; i++){
+                if(Math.abs(m[i][j]) == 0){
+                    count++;
+                }
+            }
+            if(count > nolDiKolom){
+                nolDiKolom = count;
+                kolomTerbaik = j;
+            }
+        }
+
+        double hasil = 0.0;
+
+        if(nolDiBaris >= nolDiKolom){
+            System.out.println("Ekspansi kofaktor pada baris: " + (barisTerbaik + 1));
+            for(int j = 0; j < x; j++){
+                double elemen = m[barisTerbaik][j];
+                if(Math.abs(elemen) == 0) continue;
+                Matriks sub = M.getSubMatriksKofaktor(barisTerbaik, j);
+                double minorDet = kofaktorRekursif(sub, depth + 1);
+                double nilaiKofaktor = tanda(barisTerbaik, j)*minorDet;
+                hasil += elemen*nilaiKofaktor;
+                System.out.println(indent + "  a[" + (barisTerbaik + 1) + "][" + (j + 1) + "]=" + elemen + " x kofaktor=" + String.format("%.3f", nilaiKofaktor));
+            }
+        } else {
+            System.out.println("Ekspansi kofaktor pada kolom: " + (kolomTerbaik + 1));
+            for(int i = 0; i < x; i++){
+                double elemen = m[i][kolomTerbaik];
+                if(Math.abs(elemen) == 0) continue;
+                Matriks sub = M.getSubMatriksKofaktor(i, kolomTerbaik);
+                double minorDet = kofaktorRekursif(sub, depth + 1);
+                double nilaiKofaktor = tanda(i, kolomTerbaik)*minorDet;
+                hasil += elemen*nilaiKofaktor;
+                System.out.println(indent + "  a[" + (i + 1) + "][" + (kolomTerbaik + 1) + "]=" + elemen + " x kofaktor =" + String.format("%.3f", nilaiKofaktor));
+            }
+        }
+    return hasil;
+    }
 }
