@@ -49,40 +49,22 @@ public class CubicRegressionSpline {
             XtY[i] = sum;
         }
         
-        this.beta = solveSPLGauss(XtX, XtY);
-    }
-    
-    private double[] solveSPLGauss(double[][] A, double[] b) {
-        int n = b.length;
-        double[][] aug = new double[n][n + 1];
-        
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) aug[i][j] = A[i][j];
-            aug[i][n] = b[i];
-        }
-        
-        for (int i = 0; i < n; i++) {
-            int maxIter = i;
-            for (int k = i + 1; k < n; k++) {
-                if (Math.abs(aug[k][i]) > Math.abs(aug[maxIter][i])) maxIter = k;
+        // --- Integrasi dengan library buatan temanmu (Matriks & SPL) ---
+        Matriks augmented = new Matriks(M, M + 1);
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < M; j++) {
+                augmented.setElemen(i, j, XtX[i][j]);
             }
-            double[] temp = aug[i];
-            aug[i] = aug[maxIter];
-            aug[maxIter] = temp;
-            
-            for (int k = i + 1; k < n; k++) {
-                double factor = aug[k][i] / aug[i][i];
-                for (int j = i; j <= n; j++) aug[k][j] -= factor * aug[i][j];
-            }
+            augmented.setElemen(i, M, XtY[i]);
         }
         
-        double[] res = new double[n];
-        for (int i = n - 1; i >= 0; i--) {
-            double sum = 0.0;
-            for (int j = i + 1; j < n; j++) sum += aug[i][j] * res[j];
-            res[i] = (aug[i][n] - sum) / aug[i][i];
+        HasilSPL hasil = SPL.gauss(augmented);
+        
+        if (hasil.getTipe() == HasilSPL.Tipe.TUNGGAL) {
+            this.beta = hasil.getNilai();
+        } else {
+            throw new RuntimeException("Regresi Spline gagal: Sistem persamaan normal tidak memiliki solusi tunggal.");
         }
-        return res;
     }
     
     public double prediksi(double xBaru) {
@@ -98,7 +80,7 @@ public class CubicRegressionSpline {
     
     public void printPersamaan() {
         System.out.println("Posisi Knot yang digunakan:");
-        for(int k=0; k<knots.length; k++) System.out.printf("Knot[%d] = %.3f\n", k+1, knots[k]);
+        for(int k = 0; k < knots.length; k++) System.out.printf("Knot[%d] = %.3f\n", k + 1, knots[k]);
         
         System.out.println("\nKoefisien Regresi (Beta):");
         for (int i = 0; i < beta.length; i++) {
