@@ -61,7 +61,7 @@ public class SPL {
         }
     }
     //spek
-    static String format(double v){
+    public static String format(double v){
         if(Math.abs(v) < EPS) v = 0.0;
         return String.format("%.3f", v);
     }
@@ -167,5 +167,104 @@ public class SPL {
         } else {
             sb.append(format(abs)).append(simbol);
         }
+    }
+
+    public static HasilSPL matriksBalikan(Matriks augmented){
+        int n = augmented.getRows();
+        if(augmented.getCols() - 1 != n){
+            throw new IllegalArgumentException("Metode matriks balikan hanya bisa dipakai jika jumlah persamaan sama dengan jumlah variabel");
+        }
+
+        Matriks a = ambilKoefisien(augmented, n);
+        Matriks b = new Matriks(n, 1);
+        for(int i = 0; i < n; i++){
+            b.setElemen(i, 0, augmented.getElemen(i, n));
+        }
+
+        List<String> langkah = new ArrayList<>();
+        Matriks balikan = Invers.gaussJordan(a, langkah);
+        Matriks x = balikan.kali(b);
+        langkah.add("x = A^-1 * b:\n" + x.keString());
+
+        double[] nilai = new double[n];
+        for(int i = 0; i < n; i++){
+            nilai[i] = x.getElemen(i, 0);
+        }
+        return HasilSPL.tunggal(nilai, langkah);
+    }
+
+    public static HasilSPL cramer(Matriks augmented){
+        int n = augmented.getRows();
+        if(augmented.getCols() - 1 != n){
+            throw new IllegalArgumentException("Kaidah Cramer hanya bisa dipakai jika jumlah persamaan sama dengan jumlah variabel");
+        }
+
+        Matriks a = ambilKoefisien(augmented, n);
+        List<String> langkah = new ArrayList<>();
+
+        double detA = determinanInternal(a);
+        langkah.add("det(A) = " + format(detA));
+        if(detA == 0.0){
+            throw new IllegalArgumentException("Kaidah Cramer tidak bisa dipakai karena det(A) = 0");
+        }
+
+        double[] nilai = new double[n];
+        for(int k = 0; k < n; k++){
+            Matriks ak = a.copy();
+            for(int i = 0; i < n; i++){
+                ak.setElemen(i, k, augmented.getElemen(i, n));
+            }
+            double detAk = determinanInternal(ak);
+            nilai[k] = detAk / detA;
+            langkah.add("det(A" + (k + 1) + ") = " + format(detAk) + " -> x" + (k + 1) + " = " + format(nilai[k]));
+        }
+        return HasilSPL.tunggal(nilai, langkah);
+    }
+
+    private static Matriks ambilKoefisien(Matriks augmented, int jumlahKolom){
+        Matriks a = new Matriks(augmented.getRows(), jumlahKolom);
+        for(int i = 0; i < augmented.getRows(); i++){
+            for(int j = 0; j < jumlahKolom; j++){
+                a.setElemen(i, j, augmented.getElemen(i, j));
+            }
+        }
+        return a;
+    }
+
+    // Determinan tanpa cetak langkah, dipakai internal oleh Cramer dan Invers.adjoin.
+    // Untuk determinan yang ditampilkan ke user, pakai modul Determinan (menu 2).
+    static double determinanInternal(Matriks a){
+        if(a.getRows() != a.getCols()){
+            throw new IllegalArgumentException("Matriks tidak memiliki determinan karena bukan matriks persegi");
+        }
+        Matriks m = a.copy();
+        int n = m.getRows();
+        double tanda = 1.0;
+
+        for(int kol = 0; kol < n; kol++){
+            int terbesar = kol;
+            for(int r = kol + 1; r < n; r++){
+                if(Math.abs(m.getElemen(r, kol)) > Math.abs(m.getElemen(terbesar, kol))){
+                    terbesar = r;
+                }
+            }
+            if(Math.abs(m.getElemen(terbesar, kol)) < EPS_PIVOT){
+                return 0.0;
+            }
+            if(terbesar != kol){
+                m.tukarBaris(kol, terbesar);
+                tanda = -tanda;
+            }
+            for(int r = kol + 1; r < n; r++){
+                double faktor = m.getElemen(r, kol) / m.getElemen(kol, kol);
+                m.tambahBaris(r, kol, -faktor);
+            }
+        }
+
+        double det = tanda;
+        for(int i = 0; i < n; i++){
+            det *= m.getElemen(i, i);
+        }
+        return det;
     }
 }

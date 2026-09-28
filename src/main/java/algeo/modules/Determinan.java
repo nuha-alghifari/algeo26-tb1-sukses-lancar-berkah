@@ -57,7 +57,7 @@ public class Determinan {
         }
 
         double det;
-        if(jumlahTukarBaris != 0){
+        if(jumlahTukarBaris % 2 != 0){
             det = -kaliDiagonal;
         } else {
             det = kaliDiagonal;
@@ -102,7 +102,7 @@ public class Determinan {
 
         if(x == 2){
             double hasilm2x2 = m[0][0]*m[1][1] - m[0][1]*m[1][0];
-            System.out.println("Matriks 2x2, Determinan = " + String.format(".3%", hasilm2x2));
+            System.out.println("Matriks 2x2, Determinan = " + String.format("%.3f", hasilm2x2));
             return hasilm2x2;
         }
 
