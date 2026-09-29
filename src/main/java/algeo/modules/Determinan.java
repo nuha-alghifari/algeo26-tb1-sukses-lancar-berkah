@@ -1,6 +1,8 @@
 package algeo.modules;
 
-public class Determinan {
+public class Determinan{
+    private static final double EPS = 1e-9;
+
     public static double reduksiBaris(Matriks M){
         if(M.getRows() != M.getCols()){
             throw new IllegalArgumentException("Matriks tidak memiliki determinan");
@@ -26,7 +28,7 @@ public class Determinan {
                 }
             }
 
-            if(max == 0){
+            if(max < EPS){
                 System.out.println("Kolom " + i + "semuanya bernilai 0, determinan = 0");
                 return 0.0;
             }
@@ -114,7 +116,7 @@ public class Determinan {
         for(int i = 0; i < x; i++){
             int count = 0;
             for(int j = 0; j < x; j++){
-                if(Math.abs(m[i][j]) == 0){
+                if(Math.abs(m[i][j]) < EPS){
                     count++;
                 }
             }
@@ -127,7 +129,7 @@ public class Determinan {
         for(int j = 0; j < x; j++){
             int count = 0;
             for(int i = 0; i < x; i++){
-                if(Math.abs(m[i][j]) == 0){
+                if(Math.abs(m[i][j]) < EPS){
                     count++;
                 }
             }
@@ -143,7 +145,7 @@ public class Determinan {
             System.out.println("Ekspansi kofaktor pada baris: " + (barisTerbaik + 1));
             for(int j = 0; j < x; j++){
                 double elemen = m[barisTerbaik][j];
-                if(Math.abs(elemen) == 0) continue;
+                if(Math.abs(elemen) < EPS) continue;
                 Matriks sub = M.getSubMatriksKofaktor(barisTerbaik, j);
                 double minorDet = kofaktorRekursif(sub, depth + 1);
                 double nilaiKofaktor = tanda(barisTerbaik, j)*minorDet;
@@ -154,7 +156,7 @@ public class Determinan {
             System.out.println("Ekspansi kofaktor pada kolom: " + (kolomTerbaik + 1));
             for(int i = 0; i < x; i++){
                 double elemen = m[i][kolomTerbaik];
-                if(Math.abs(elemen) == 0) continue;
+                if(Math.abs(elemen) > EPS) continue;
                 Matriks sub = M.getSubMatriksKofaktor(i, kolomTerbaik);
                 double minorDet = kofaktorRekursif(sub, depth + 1);
                 double nilaiKofaktor = tanda(i, kolomTerbaik)*minorDet;
