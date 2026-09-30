@@ -13,15 +13,6 @@ public class Matriks {
         this.data = new double[rows][cols];
     }
 
-    public Matriks() {
-        // Inisialisasi default jika diperlukan
-    }
-
-    public void jalankan() {
-        System.out.println("Modul Matriks berhasil dijalankan!");
-        // Masukkan logika/menu utama kamu di sini
-    }
-
     public int getRows(){
         return this.rows;
     }

@@ -12,9 +12,13 @@ public class Determinan{
         Matriks obe = M.copy();
         double[][] m = obe.getData();
 
+        boolean cetakMatriks = (x <= 10);
+
         System.out.println("Menghitung Determinan Matriks Dengan Metode Reduksi Baris/OBE");
-        System.out.println("Matriks Awal:");
-        M.printMatriks();
+        if (cetakMatriks) {
+            System.out.println("Matriks Awal:");
+            M.printMatriks();
+        }
 
         int jumlahTukarBaris = 0;
 
@@ -29,16 +33,21 @@ public class Determinan{
             }
 
             if(max < EPS){
-                System.out.println("Kolom " + i + "semuanya bernilai 0, determinan = 0");
+                if(cetakMatriks){
+                    System.out.println("Kolom " + i + "semuanya bernilai 0, determinan = 0");
+                }
                 return 0.0;
             }
 
-            if(pivot != i){
+            if (pivot != i){
                 obe.tukarBaris(i, pivot);
                 jumlahTukarBaris++;
-                System.out.println("Baris " + (i+1) + " ditukar dengan baris " + (pivot + 1));
-                obe.printMatriks();
-            }
+    
+                    if (cetakMatriks) {
+                        System.out.println("\nBaris " + (i + 1) + " ditukar dengan baris " + (pivot + 1));
+                        obe.printMatriks();
+                    }
+                }
 
             for(int k = i+1; k < x; k++){
                 if(Math.abs(m[k][i]) > 0){
@@ -49,8 +58,10 @@ public class Determinan{
                     System.out.printf("B%d = B%d - (%.3f) x B%d%n", k + 1, k + 1, faktor, i + 1);
                 }
             }
-            System.out.println("Matriks setelah di lakukan obe: ");
-            obe.printMatriks();
+            if(cetakMatriks){
+                System.out.println("\nMatriks setelah di lakukan obe: ");
+                obe.printMatriks();
+            }
         }
 
         double kaliDiagonal = 1.0;
@@ -156,7 +167,7 @@ public class Determinan{
             System.out.println("Ekspansi kofaktor pada kolom: " + (kolomTerbaik + 1));
             for(int i = 0; i < x; i++){
                 double elemen = m[i][kolomTerbaik];
-                if(Math.abs(elemen) > EPS) continue;
+                if(Math.abs(elemen) < EPS) continue;
                 Matriks sub = M.getSubMatriksKofaktor(i, kolomTerbaik);
                 double minorDet = kofaktorRekursif(sub, depth + 1);
                 double nilaiKofaktor = tanda(i, kolomTerbaik)*minorDet;
