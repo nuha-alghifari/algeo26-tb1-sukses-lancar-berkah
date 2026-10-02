@@ -47,6 +47,7 @@ public class Determinan{
                         System.out.println("\nBaris " + (i + 1) + " ditukar dengan baris " + (pivot + 1));
                         obe.printMatriks();
                     }
+                System.out.println("Jumlah pertukaran baris = " + jumlahTukarBaris);
                 }
 
             for(int k = i+1; k < x; k++){
@@ -75,7 +76,6 @@ public class Determinan{
         } else {
             det = kaliDiagonal;
         }
-
         System.out.printf("Determinan = %.3f%n", det);
         return det;
     }
@@ -84,7 +84,13 @@ public class Determinan{
         if(M.getRows() != M.getCols()){
             throw new IllegalArgumentException("Matriks tidak memiliki determinan");
         }
-        System.out.println("Menghitung Determinan Matriks Dengan Metode Reduksi Baris/OBE");
+        System.out.println("Menghitung Determinan Matriks Dengan Ekspansi Kofaktor");
+
+        if(M.getRows() > 10){
+            System.out.println("Matriks terlalu besar dan tidak memungkinkan dihitung menggunakan Ekspansi Kofaktor\n");
+            System.out.println("Silahkan pilih metode reduksi baris/OBE");
+        }
+
         return kofaktorRekursif(M, 0);
     }
 
@@ -96,26 +102,29 @@ public class Determinan{
         }
     }
 
-    private static String indentasi(int depth){
-        StringBuilder a = new StringBuilder();
-        for(int i = 0; i < depth; i++){
-            a.append("  ");
+    private static String formatAngka(double val) {
+        String s = String.format("%.3f", val);
+        if (val < 0) {
+            return "(" + s + ")";
         }
-        return a.toString();
+        return s;
     }
 
-    public static double kofaktorRekursif(Matriks M, int depth){
+    public static double kofaktorRekursif(Matriks M, int depth) {
         int x = M.getRows();
         double[][] m = M.getData();
-        String indent = indentasi(depth);
 
-        if(x == 1){
+        System.out.println("\nPerhitungan Matriks (" + x + "x" + x + ")");
+        M.printMatriks();
+
+        if (x == 1) {
+            System.out.println("Matriks 1x1, Determinan = " + formatAngka(m[0][0]));
             return m[0][0];
         }
 
-        if(x == 2){
-            double hasilm2x2 = m[0][0]*m[1][1] - m[0][1]*m[1][0];
-            System.out.println("Matriks 2x2, Determinan = " + String.format("%.3f", hasilm2x2));
+        if (x == 2) {
+            double hasilm2x2 = m[0][0] * m[1][1] - m[0][1] * m[1][0];
+            System.out.println("Matriks 2x2, Determinan = (" + formatAngka(m[0][0]) + " * " + formatAngka(m[1][1]) + ") - (" + formatAngka(m[0][1]) + " * " + formatAngka(m[1][0]) + ") = " + formatAngka(hasilm2x2));
             return hasilm2x2;
         }
 
@@ -124,57 +133,110 @@ public class Determinan{
         int nolDiBaris = -1;
         int nolDiKolom = -1;
 
-        for(int i = 0; i < x; i++){
+        for (int i = 0; i < x; i++) {
             int count = 0;
-            for(int j = 0; j < x; j++){
-                if(Math.abs(m[i][j]) < EPS){
+            for (int j = 0; j < x; j++) {
+                if (Math.abs(m[i][j]) < EPS) {
                     count++;
                 }
             }
-            if(count > nolDiBaris){
+            if (count > nolDiBaris) {
                 nolDiBaris = count;
                 barisTerbaik = i;
             }
         }
 
-        for(int j = 0; j < x; j++){
+        for (int j = 0; j < x; j++) {
             int count = 0;
-            for(int i = 0; i < x; i++){
-                if(Math.abs(m[i][j]) < EPS){
+            for (int i = 0; i < x; i++) {
+                if (Math.abs(m[i][j]) < EPS) {
                     count++;
                 }
             }
-            if(count > nolDiKolom){
+            if (count > nolDiKolom) {
                 nolDiKolom = count;
                 kolomTerbaik = j;
             }
         }
 
         double hasil = 0.0;
+        String elemenKaliKofaktor = "";
 
-        if(nolDiBaris >= nolDiKolom){
-            System.out.println("Ekspansi kofaktor pada baris: " + (barisTerbaik + 1));
-            for(int j = 0; j < x; j++){
+        if (nolDiBaris >= nolDiKolom) {
+            System.out.println(">> Ekspansi kofaktor pada baris: " + (barisTerbaik + 1));
+
+            for (int j = 0; j < x; j++) {
                 double elemen = m[barisTerbaik][j];
-                if(Math.abs(elemen) < EPS) continue;
+                System.out.println("\nElemen m[" + (barisTerbaik + 1) + "][" + (j + 1) + "] = " + formatAngka(elemen));
+
+                if (Math.abs(elemen) < EPS) {
+                    System.out.println("Elemen bernilai 0 (Dilewati)\n");
+                    continue;
+                }
+
                 Matriks sub = M.getSubMatriksKofaktor(barisTerbaik, j);
+                System.out.println("Submatriks kofaktor setelah menghapus Baris " + (barisTerbaik + 1) + " & Kolom " + (j + 1) + ":");
+                sub.printMatriks();
+
                 double minorDet = kofaktorRekursif(sub, depth + 1);
-                double nilaiKofaktor = tanda(barisTerbaik, j)*minorDet;
-                hasil += elemen*nilaiKofaktor;
-                System.out.println(indent + "  a[" + (barisTerbaik + 1) + "][" + (j + 1) + "]=" + elemen + " x kofaktor=" + String.format("%.3f", nilaiKofaktor));
+                int t = tanda(barisTerbaik, j);
+                double nilaiKofaktor = t * minorDet;
+                double hasilKali = elemen * nilaiKofaktor;
+                hasil += hasilKali;
+
+                System.out.println("Kofaktor C[" + (barisTerbaik + 1) + "][" + (j + 1) + "] = (" + (t > 0 ? "+1" : "-1") + ") * " + formatAngka(minorDet) + " = " + formatAngka(nilaiKofaktor));
+                System.out.println("Hasil Perkalian m[" + (barisTerbaik + 1) + "][" + (j + 1) + "] * C[" + (barisTerbaik + 1) + "][" + (j + 1) + "] = " + formatAngka(elemen) + " * " + formatAngka(nilaiKofaktor) + " = " + formatAngka(hasilKali));
+
+                if (!elemenKaliKofaktor.equals("")) {
+                    if (hasilKali >= 0) {
+                        elemenKaliKofaktor += " + " + String.format("%.3f", hasilKali);
+                    } else {
+                        elemenKaliKofaktor += " - " + String.format("%.3f", Math.abs(hasilKali));
+                    }
+                } else {
+                    elemenKaliKofaktor += formatAngka(hasilKali);
+                }
             }
         } else {
-            System.out.println("Ekspansi kofaktor pada kolom: " + (kolomTerbaik + 1));
-            for(int i = 0; i < x; i++){
+            System.out.println(">> Ekspansi kofaktor pada kolom: " + (kolomTerbaik + 1));
+
+            for (int i = 0; i < x; i++) {
                 double elemen = m[i][kolomTerbaik];
-                if(Math.abs(elemen) < EPS) continue;
+                System.out.println("Elemen m[" + (i + 1) + "][" + (kolomTerbaik + 1) + "] = " + formatAngka(elemen) + "\n");
+
+                if (Math.abs(elemen) < EPS) {
+                    System.out.println("Elemen bernilai 0 (Dilewati).");
+                    continue;
+                }
+
                 Matriks sub = M.getSubMatriksKofaktor(i, kolomTerbaik);
+                System.out.println("Submatriks kofaktor setelah menghapus Baris " + (i + 1) + " & Kolom " + (kolomTerbaik + 1) + ":");
+                sub.printMatriks();
+
                 double minorDet = kofaktorRekursif(sub, depth + 1);
-                double nilaiKofaktor = tanda(i, kolomTerbaik)*minorDet;
-                hasil += elemen*nilaiKofaktor;
-                System.out.println(indent + "  a[" + (i + 1) + "][" + (kolomTerbaik + 1) + "]=" + elemen + " x kofaktor =" + String.format("%.3f", nilaiKofaktor));
+                int t = tanda(i, kolomTerbaik);
+                double nilaiKofaktor = t * minorDet;
+                double hasilKali = elemen * nilaiKofaktor;
+                hasil += hasilKali;
+
+                System.out.println("Kofaktor C[" + (i + 1) + "][" + (kolomTerbaik + 1) + "] = (" + (t > 0 ? "+1" : "-1") + ") * " + formatAngka(minorDet) + " = " + formatAngka(nilaiKofaktor));
+                System.out.println("Hasil Perkalian m[" + (i + 1) + "][" + (kolomTerbaik + 1) + "] * C[" + (i + 1) + "][" + (kolomTerbaik + 1) + "] = " + formatAngka(elemen) + " * " + formatAngka(nilaiKofaktor) + " = " + formatAngka(hasilKali));
+
+                if (!elemenKaliKofaktor.equals("")) {
+                    if (hasilKali >= 0) {
+                        elemenKaliKofaktor += " + " + String.format("%.3f", hasilKali);
+                    } else {
+                        elemenKaliKofaktor += " - " + String.format("%.3f", Math.abs(hasilKali));
+                    }
+                } else {
+                    elemenKaliKofaktor += formatAngka(hasilKali);
+                }
             }
         }
-    return hasil;
+
+        System.out.println("Hasil: " + elemenKaliKofaktor + " = " + formatAngka(hasil));
+        System.out.println("Total Determinan Sub-bagian ini = " + formatAngka(hasil) + "\n");
+
+        return hasil;
     }
 }
