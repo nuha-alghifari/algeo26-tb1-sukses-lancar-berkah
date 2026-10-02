@@ -99,7 +99,7 @@ mvn clean package
 Jalankan program dari JAR (cukup Java 17 atau lebih baru, tanpa Maven):
 
 ```bash
-java -jar bin/matrix-calculator.jar
+java -jar bin/matrix-calculator-1.0-SNAPSHOT.jar
 ```
 
 Jalankan perintah di folder utama repositori supaya lokasi relatif berkas uji seperti `test/spl_kasus1.txt` terbaca.
