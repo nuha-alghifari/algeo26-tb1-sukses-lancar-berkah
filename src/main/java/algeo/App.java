@@ -99,7 +99,8 @@ public class App {
         Matriks balikan = (metode == 1) ? Invers.gaussJordan(a, langkah) : Invers.adjoin(a, langkah);
 
         cetakLangkah(langkah);
-        System.out.println("Matriks balikan:\n" + balikan.keString());
+        System.out.println("Matriks balikan:\n" + SPL.tampil(balikan));
+        if(balikan.getRows() > 11) System.out.println("Hasil lengkap hanya ada di berkas keluaran (pilih simpan di bawah).");
 
         String isi = "Metode matriks balikan: " + namaMetode + "\n\n"
                 + "Input matriks:\n" + a.keString() + "\n"
@@ -177,6 +178,7 @@ public class App {
     private static void menuRegresiSpline(Scanner sc){
         double[][] titik = ambilTitik(sc);
 
+        int derajat = bacaInt(sc, "Derajat spline (3 = kubik sesuai spek, 1 = linear): ", 1, 3);
         int k = bacaInt(sc, "Jumlah knot K: ", 0, titik.length);
         double[] knot = new double[k];
         for(int i = 0; i < k; i++){
@@ -185,7 +187,7 @@ public class App {
 
         CubicRegressionSpline regresi = new CubicRegressionSpline();
         String langkahTeks = tangkapOutput(() -> {
-            regresi.hitungRegresi(titik, knot);
+            regresi.hitungRegresi(titik, knot, derajat);
             regresi.printPersamaan();
         });
         System.out.print(langkahTeks);

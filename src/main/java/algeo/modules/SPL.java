@@ -7,10 +7,24 @@ public class SPL {
     static final double EPS = 1e-9;
     static final double EPS_PIVOT = 1e-13;
 
+    // Matriks lebih besar dari ini: langkah OBE per baris tidak dicatat (snapshot 1001x1001 per langkah = kehabisan memori).
+    static final int BATAS_LANGKAH = 11;
+    // Cramer (n+1 determinan) dan adjoin (n^2 determinan) tidak realistis untuk n besar.
+    static final int BATAS_METODE_MAHAL = 100;
+
+    public static String tampil(Matriks m){
+        if(m.getRows() <= BATAS_LANGKAH) return m.keString();
+        return "(matriks " + m.getRows() + "x" + m.getCols() + " terlalu besar untuk ditampilkan)\n";
+    }
+
     static List<Integer> eliminasiMaju(Matriks m, int batasKolom, List<String> langkah){
         int baris = m.getRows();
         List<Integer> kolomPivot = new ArrayList<>();
         int barisPivot = 0;
+        boolean catat = baris <= BATAS_LANGKAH;
+        if(!catat){
+            langkah.add("Matriks berukuran " + baris + "x" + m.getCols() + " (> " + BATAS_LANGKAH + " baris): langkah OBE individual tidak ditampilkan.");
+        }
 
         for(int kol = 0; kol < batasKolom && barisPivot < baris; kol++){
             int terbesar = barisPivot;
@@ -25,20 +39,20 @@ public class SPL {
 
             if(terbesar != barisPivot){
                 m.tukarBaris(barisPivot, terbesar);
-                langkah.add("Tukar baris R" + (barisPivot + 1) + " <-> R" + (terbesar + 1) + " (partial pivoting)\n" + m.keString());
+                if(catat) langkah.add("Tukar baris R" + (barisPivot + 1) + " <-> R" + (terbesar + 1) + " (partial pivoting)\n" + m.keString());
             }
 
             double pivot = m.getElemen(barisPivot, kol);
             if(Math.abs(pivot - 1.0) > EPS){
                 m.kaliBaris(barisPivot, 1.0 / pivot);
-                langkah.add("R" + (barisPivot + 1) + " <- R" + (barisPivot + 1) + " / " + format(pivot) + "\n" + m.keString());
+                if(catat) langkah.add("R" + (barisPivot + 1) + " <- R" + (barisPivot + 1) + " / " + format(pivot) + "\n" + m.keString());
             }
 
             for(int r = barisPivot + 1; r < baris; r++){
                 double faktor = m.getElemen(r, kol);
                 if(faktor != 0.0){
                     m.tambahBaris(r, barisPivot, -faktor);
-                    langkah.add("R" + (r + 1) + " <- R" + (r + 1) + " - (" + format(faktor) + ") * R" + (barisPivot + 1) + "\n" + m.keString());
+                    if(catat) langkah.add("R" + (r + 1) + " <- R" + (r + 1) + " - (" + format(faktor) + ") * R" + (barisPivot + 1) + "\n" + m.keString());
                 }
             }
 
@@ -49,13 +63,14 @@ public class SPL {
     }
 
     static void eliminasiMundur(Matriks m, List<Integer> kolomPivot, List<String> langkah){
+        boolean catat = m.getRows() <= BATAS_LANGKAH;
         for(int i = kolomPivot.size() - 1; i >= 0; i--){
             int kol = kolomPivot.get(i);
             for(int r = i - 1; r >= 0; r--){
                 double faktor = m.getElemen(r, kol);
                 if(faktor != 0.0){
                     m.tambahBaris(r, i, -faktor);
-                    langkah.add("R" + (r + 1) + " <- R" + (r + 1) + " - (" + format(faktor) + ") * R" + (i + 1) + "\n" + m.keString());
+                    if(catat) langkah.add("R" + (r + 1) + " <- R" + (r + 1) + " - (" + format(faktor) + ") * R" + (i + 1) + "\n" + m.keString());
                 }
             }
         }
@@ -70,10 +85,10 @@ public class SPL {
         Matriks m = augmented.copy();
         int jumlahVar = m.getCols() - 1;
         List<String> langkah = new ArrayList<>();
-        langkah.add("Matriks augmented awal:\n" + m.keString());
+        langkah.add("Matriks augmented awal:\n" + tampil(m));
 
         List<Integer> kolomPivot = eliminasiMaju(m, jumlahVar, langkah);
-        langkah.add("=== Hasil eliminasi maju (matriks eselon baris) ===\n" + m.keString());
+        langkah.add("=== Hasil eliminasi maju (matriks eselon baris) ===\n" + tampil(m));
 
         langkah.add("=== Substitusi mundur ===");
         eliminasiMundur(m, kolomPivot, langkah);
@@ -85,11 +100,11 @@ public class SPL {
         Matriks m = augmented.copy();
         int jumlahVar = m.getCols() - 1;
         List<String> langkah = new ArrayList<>();
-        langkah.add("Matriks augmented awal:\n" + m.keString());
+        langkah.add("Matriks augmented awal:\n" + tampil(m));
 
         List<Integer> kolomPivot = eliminasiMaju(m, jumlahVar, langkah);
         eliminasiMundur(m, kolomPivot, langkah);
-        langkah.add("=== Hasil eliminasi Gauss-Jordan (matriks eselon baris tereduksi) ===\n" + m.keString());
+        langkah.add("=== Hasil eliminasi Gauss-Jordan (matriks eselon baris tereduksi) ===\n" + tampil(m));
 
         return ambilHasil(m, kolomPivot, jumlahVar, langkah);
     }
@@ -184,7 +199,7 @@ public class SPL {
         List<String> langkah = new ArrayList<>();
         Matriks balikan = Invers.gaussJordan(a, langkah);
         Matriks x = balikan.kali(b);
-        langkah.add("x = A^-1 * b:\n" + x.keString());
+        langkah.add("x = A^-1 * b:\n" + tampil(x));
 
         double[] nilai = new double[n];
         for(int i = 0; i < n; i++){
@@ -199,11 +214,18 @@ public class SPL {
             throw new IllegalArgumentException("Kaidah Cramer hanya bisa dipakai jika jumlah persamaan sama dengan jumlah variabel");
         }
 
+        if(n > BATAS_METODE_MAHAL){
+            throw new IllegalArgumentException("Kaidah Cramer butuh " + (n + 1) + " determinan (sangat lambat) sehingga tidak praktis untuk n > " + BATAS_METODE_MAHAL + ". Gunakan Eliminasi Gauss atau Gauss-Jordan.");
+        }
+
         Matriks a = ambilKoefisien(augmented, n);
         List<String> langkah = new ArrayList<>();
 
         double detA = determinanInternal(a);
         langkah.add("det(A) = " + format(detA));
+        if(Double.isInfinite(detA) || Double.isNaN(detA)){
+            throw new IllegalArgumentException("Determinan terlalu besar untuk dihitung dengan double. Gunakan Eliminasi Gauss atau Gauss-Jordan.");
+        }
         if(detA == 0.0){
             throw new IllegalArgumentException("Kaidah Cramer tidak bisa dipakai karena det(A) = 0");
         }

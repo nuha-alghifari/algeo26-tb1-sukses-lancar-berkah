@@ -20,7 +20,6 @@ public class PolynomialInterpolation {
             augmented.setElemen(i, n, titikData[i][1]);
         }
 
-        // --- Integrasi dengan library buatan temanmu (Matriks & SPL) ---
         HasilSPL hasil = SPL.gauss(augmented);
 
         if (hasil.getTipe() == HasilSPL.Tipe.TUNGGAL) {
