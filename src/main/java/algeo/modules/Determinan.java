@@ -91,7 +91,7 @@ public class Determinan{
             System.out.println("Silahkan pilih metode reduksi baris/OBE");
         }
 
-        return kofaktorRekursif(M, 0);
+        return kofaktorRekursif(M);
     }
 
     private static int tanda(int i, int j){
@@ -110,7 +110,7 @@ public class Determinan{
         return s;
     }
 
-    public static double kofaktorRekursif(Matriks M, int depth) {
+    public static double kofaktorRekursif(Matriks M) {
         int x = M.getRows();
         double[][] m = M.getData();
 
@@ -178,7 +178,7 @@ public class Determinan{
                 System.out.println("Submatriks kofaktor setelah menghapus Baris " + (barisTerbaik + 1) + " & Kolom " + (j + 1) + ":");
                 sub.printMatriks();
 
-                double minorDet = kofaktorRekursif(sub, depth + 1);
+                double minorDet = kofaktorRekursif(sub);
                 int t = tanda(barisTerbaik, j);
                 double nilaiKofaktor = t * minorDet;
                 double hasilKali = elemen * nilaiKofaktor;
@@ -213,7 +213,7 @@ public class Determinan{
                 System.out.println("Submatriks kofaktor setelah menghapus Baris " + (i + 1) + " & Kolom " + (kolomTerbaik + 1) + ":");
                 sub.printMatriks();
 
-                double minorDet = kofaktorRekursif(sub, depth + 1);
+                double minorDet = kofaktorRekursif(sub);
                 int t = tanda(i, kolomTerbaik);
                 double nilaiKofaktor = t * minorDet;
                 double hasilKali = elemen * nilaiKofaktor;
