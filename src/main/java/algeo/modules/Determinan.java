@@ -34,7 +34,7 @@ public class Determinan{
 
             if(max < EPS){
                 if(cetakMatriks){
-                    System.out.println("Kolom " + i + "semuanya bernilai 0, determinan = 0");
+                    System.out.println("Kolom " + i + " semuanya bernilai 0, determinan = 0");
                 }
                 return 0.0;
             }
